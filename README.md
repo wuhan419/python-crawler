@@ -9,7 +9,9 @@ GET VIDEO INFORMATION FROM NET
 PROJECT DEPEND
 -----------------------------------
 *PYTHON
+
 *PYQUERY
+
 *MYSQL
 
 
@@ -22,5 +24,7 @@ PROJECT DEPEND
 依赖
 -----------------------------------
 *PYTHON
+
 *PYQUERY
+
 *MYSQL
