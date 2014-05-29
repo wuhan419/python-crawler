@@ -4,7 +4,7 @@ __author__ = 'Sean Lei'
 from pyquery import PyQuery as Pq
 
 from base_crawler import BaseCrawler
-
+from video_detail_crawler import  VideoDetailCrawler
 
 class VideoListCrawler(BaseCrawler):
     def __init__(self):
@@ -18,7 +18,7 @@ class VideoListCrawler(BaseCrawler):
         """
         generate all url to visit
         """
-
+        ##from page 1 to anypage which < 200
         for page_no in range(1, 2):
             self._seed_url.append(self._domain + self._info_uri + page_no.__str__())
 
@@ -30,4 +30,5 @@ class VideoListCrawler(BaseCrawler):
             video_id = video_id[4:]
             detail_url = self._domain + self._detail_uri + video_id
             self.detail_info_urls.append(detail_url)
-
+            crawler = VideoDetailCrawler(detail_url)
+            crawler.craw()
