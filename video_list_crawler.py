@@ -4,7 +4,8 @@ __author__ = 'Sean Lei'
 from pyquery import PyQuery as Pq
 
 from base_crawler import BaseCrawler
-from video_detail_crawler import  VideoDetailCrawler
+from video_detail_crawler import VideoDetailCrawler
+
 
 class VideoListCrawler(BaseCrawler):
     def __init__(self):

@@ -5,6 +5,7 @@ from base_crawler import BaseCrawler
 from pyquery import PyQuery as Pq
 from DAO import DAO
 
+
 class VideoDetailCrawler(BaseCrawler):
     def __init__(self, seed_url):
         self._seed_url = seed_url
@@ -45,6 +46,7 @@ class VideoDetailCrawler(BaseCrawler):
         doc2 = Pq(doc('div').filter("#video_genres"))
         for tag in doc2("a[rel='category tag']").text().split(" "):
             if tag is not None:
+                #FIXME 局部变量不要用self 不要用双下划线
                 self.__video_tag = {
                     'video_id': self.__video_detail["id"],
                     'tag': tag
@@ -56,6 +58,7 @@ class VideoDetailCrawler(BaseCrawler):
         doc2 = Pq(doc('div').filter("#video_cast"))
         for cast in doc2("a[rel='tag']").text().split(" "):
             if cast is not None:
+                #FIXME 局部变量不要用self 不要用双下划线
                 self.__video_cast = {'video_id': self.__video_detail["id"], 'actor': cast}
                 print("video_cast is ", self.__video_cast)
                 self.__cast.append(self.__video_cast)
@@ -67,8 +70,10 @@ class VideoDetailCrawler(BaseCrawler):
     def _video_dao(self):
         dao = DAO()
         #表中是否已有记录
+        #FIXME sql关键字统一用大写或者小写 保持一致
         query_sql = "select * from av_info_main where video_id='{}' and maker = '{}'".format(self.__video_detail["id"],
-                                                                                             self.__video_detail["maker"])
+                                                                                             self.__video_detail[
+                                                                                                 "maker"])
 
         if dao.execute_query(query_sql):
             print("video{} is already exists ,so next".format(self.__cast[0]["video_id"]))
@@ -86,10 +91,13 @@ class VideoDetailCrawler(BaseCrawler):
                          " VALUES ('{}','{}' )".format(tag1["video_id"], tag1["tag"])
             dao.execute_dml(insert_sql)
         insert_sql = "INSERT INTO av_info_main (video_id,video_name,video_src,img,maker )" \
-                     " VALUES ('{}','{}','{}','{}','{}' )".format(self.__video_detail["id"], self.__video_detail["name"],
-                                                                  self.__video_detail["url"], self.__video_detail["img"],
+                     " VALUES ('{}','{}','{}','{}','{}' )".format(self.__video_detail["id"],
+                                                                  self.__video_detail["name"],
+                                                                  self.__video_detail["url"],
+                                                                  self.__video_detail["img"],
                                                                   self.__video_detail["maker"])
         dao.execute_dml(insert_sql)
+
 
 if __name__ == '__main__':
     v1 = VideoDetailCrawler("http://www.javlibrary.com/cn/?v=javlij3by4")

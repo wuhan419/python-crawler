@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 #----------------------------------begin-------
 defaultCharacterSet = "utf8"
 
-
+#TODO 干掉这个文件吧
 def find_av(a, host, headers):
     # global cursor
     video_detail = {
