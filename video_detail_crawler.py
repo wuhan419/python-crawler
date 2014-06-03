@@ -3,7 +3,7 @@ __author__ = 'Sean Lei&wuhan'
 
 from base_crawler import BaseCrawler
 from pyquery import PyQuery as Pq
-from DAO import DAO
+from dao import Dao
 
 
 class VideoDetailCrawler(BaseCrawler):
@@ -12,7 +12,7 @@ class VideoDetailCrawler(BaseCrawler):
         self.__video_detail = {
             'id': '',
             'name': '',
-            'url': "",
+            'url': '',
             'img': '',
             'maker': ''
         }
@@ -46,32 +46,30 @@ class VideoDetailCrawler(BaseCrawler):
         doc2 = Pq(doc('div').filter("#video_genres"))
         for tag in doc2("a[rel='category tag']").text().split(" "):
             if tag is not None:
-                #FIXME 局部变量不要用self 不要用双下划线
-                self.__video_tag = {
+                video_tag = {
                     'video_id': self.__video_detail["id"],
                     'tag': tag
                 }
-                self.__tags.append(self.__video_tag)
+                self.__tags.append(video_tag)
             else:
                 continue
         # cast #演员
         doc2 = Pq(doc('div').filter("#video_cast"))
         for cast in doc2("a[rel='tag']").text().split(" "):
             if cast is not None:
-                #FIXME 局部变量不要用self 不要用双下划线
-                self.__video_cast = {'video_id': self.__video_detail["id"], 'actor': cast}
-                print("video_cast is ", self.__video_cast)
-                self.__cast.append(self.__video_cast)
+                video_cast = {'video_id': self.__video_detail["id"], 'actor': cast}
+                print("video_cast is ", video_cast)
+                self.__cast.append(video_cast)
                 print(cast)
             else:
                 continue
         self._video_dao()
 
     def _video_dao(self):
-        dao = DAO()
+        dao = Dao()
         #表中是否已有记录
-        #FIXME sql关键字统一用大写或者小写 保持一致
-        query_sql = "select * from av_info_main where video_id='{}' and maker = '{}'".format(self.__video_detail["id"],
+        #TODO 使用事务处理每一个插入
+        query_sql = "SELECT * FROM av_info_main WHERE video_id='{}' AND maker = '{}'".format(self.__video_detail["id"],
                                                                                              self.__video_detail[
                                                                                                  "maker"])
 
