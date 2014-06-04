@@ -29,11 +29,18 @@ class BaseCrawler(object):
     @staticmethod
     def get_page_content_str(url):
         print(url)
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
-        request = urllib.request.Request(url=url, headers=headers)
-        m_fp = urllib.request.urlopen(request, timeout=100)
-        html_str = m_fp.read().decode('utf-8')
-        m_fp.close()
+        try:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+            request = urllib.request.Request(url=url, headers=headers)
+            m_fp = urllib.request.urlopen(request, timeout=100)
+            html_str = m_fp.read().decode('utf-8')
+            m_fp.close()
+        except urllib.error.URLError as err:
+            logfile = open('test.log', 'a')
+            logfile.write("Error: {} \n in  url : {}".format(err, url))
+            logfile.close()
+            print("error in {}.get_page_content_str".format(__name__))
+            return None
         return html_str
 
     def craw(self):
