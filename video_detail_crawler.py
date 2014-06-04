@@ -34,7 +34,6 @@ class VideoDetailCrawler(BaseCrawler):
         #image
         self.__video_detail["img"] = doc('img').filter('#video_jacket_img').attr("src")
         #name 片名
-        print(doc('div>h3>a').text())
         self.__video_detail["name"] = doc('div>h3>a').text()
         #ID 识别码
         doc2 = Pq(doc('div').filter("#video_id"))
@@ -60,41 +59,41 @@ class VideoDetailCrawler(BaseCrawler):
                 video_cast = {'video_id': self.__video_detail["id"], 'actor': cast}
                 print("video_cast is ", video_cast)
                 self.__cast.append(video_cast)
-                print(cast)
             else:
                 continue
         self._video_dao()
 
+    def _insert_cast(self, video_cast1):
+        return "INSERT INTO video_cast (video_id,actor)" \
+               " VALUES ('{}','{}' )".format(video_cast1["video_id"], video_cast1["actor"])
+
+    def _insert_tags(self, tag1):
+        return "INSERT INTO av_tag (video_id,video_tag )" \
+               " VALUES ('{}','{}' )".format(tag1["video_id"], tag1["tag"])
+
+    def _insert_video(self):
+        return "INSERT INTO av_info_main (video_id,video_name,video_src,img,maker )" \
+               " VALUES ('{}','{}','{}','{}','{}' )".format(self.__video_detail["id"],
+                                                            self.__video_detail["name"],
+                                                            self.__video_detail["url"],
+                                                            self.__video_detail["img"],
+                                                            self.__video_detail["maker"])
+
     def _video_dao(self):
         dao = Dao()
         #表中是否已有记录
-        #TODO 使用事务处理每一个插入
         query_sql = "SELECT * FROM av_info_main WHERE video_id='{}' AND maker = '{}'".format(self.__video_detail["id"],
                                                                                              self.__video_detail[
                                                                                                  "maker"])
-
         if dao.execute_query(query_sql):
             print("video{} is already exists ,so next".format(self.__cast[0]["video_id"]))
             return
         #数据插入操作
-        for video_cast1 in self.__cast:
-            #myset = video_cast1.split()
-            insert_sql = "INSERT INTO video_cast (video_id,actor)" \
-                         " VALUES ('{}','{}' )".format(video_cast1["video_id"], video_cast1["actor"])
-            dao.execute_dml(insert_sql)
-        for tag1 in self.__tags:
-            #myset = video_cast1.split()
-            # print(video_cast1["id"], video_cast1["name"], video_cast1["link"], video_cast1["img"])
-            insert_sql = "INSERT INTO av_tag (video_id,video_tag )" \
-                         " VALUES ('{}','{}' )".format(tag1["video_id"], tag1["tag"])
-            dao.execute_dml(insert_sql)
-        insert_sql = "INSERT INTO av_info_main (video_id,video_name,video_src,img,maker )" \
-                     " VALUES ('{}','{}','{}','{}','{}' )".format(self.__video_detail["id"],
-                                                                  self.__video_detail["name"],
-                                                                  self.__video_detail["url"],
-                                                                  self.__video_detail["img"],
-                                                                  self.__video_detail["maker"])
-        dao.execute_dml(insert_sql)
+        insert_sqls = []
+        insert_sqls.extend(list(map(self._insert_cast, self.__cast)))
+        insert_sqls.extend(list(map(self._insert_tags, self.__tags)))
+        insert_sqls.append(self._insert_video())
+        dao.execute_dmls(insert_sqls)
 
 
 if __name__ == '__main__':

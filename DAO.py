@@ -7,13 +7,13 @@ from configparser import ConfigParser
 class Dao(object):
     def __init__(self):
         config = ConfigParser()
-        config.read("config.ini")
+        config.read("etc/config.cnf")
         self.__user = config.get("dbconfig", "user")
         self.__pwd = config.get("dbconfig", "pwd")
         self.__db_host = config.get("dbconfig", "db_host")
         self.__db = config.get("dbconfig", "db")
 
-    def execute_dml(self, sql):
+    def execute_dmls(self, sqls):
         """
         execute sql update and insert
         :param sql:
@@ -21,18 +21,19 @@ class Dao(object):
         """
 
         cnx = mysql.connector.connect(user=self.__user, password=self.__pwd, host=self.__db_host, database=self.__db)
-        print(sql)
         cursor = cnx.cursor()
         try:
-            cursor.execute(sql)
+            map(cursor.execute, sqls)
+            cnx.commit()
         except mysql.connector.Error as sql_err:
             print("Error: {}".format(sql_err.msg))
-            log_sql = open('test.log', 'a')
-            log_sql.write("Error: {} \n in the insert/update sql :{}".format(sql_err.msg, sql))
+            log_sql = open('etc/test.log', 'a')
+            log_sql.write("Error: {} \n in the insert/update sql :{}".format(sql_err.msg, sqls))
             log_sql.close()
-        cnx.commit()
-        cursor.close()
-        cnx.close
+            cnx.rollback()
+        finally:
+            cursor.close()
+            cnx.close
 
     def execute_query(self, sql):
         """
@@ -59,10 +60,11 @@ class Dao(object):
                 return None
         except mysql.connector.Error as sql_err:
             print("Error: {}".format(sql_err.msg))
-            log_sql = open('test.log', 'a')
+            log_sql = open('etc/test.log', 'a')
             log_sql.write("Error: {} \n in the insert/update sql :{}".format(sql_err.msg, sql))
             log_sql.close()
             #cursor.close()
+
 
 if __name__ == '__main__':
     Dao = Dao()

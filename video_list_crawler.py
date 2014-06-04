@@ -9,6 +9,7 @@ from video_detail_crawler import VideoDetailCrawler
 
 class VideoListCrawler(BaseCrawler):
     def __init__(self):
+        #TODO 用参数化和多线程来执行抓取
         super().__init__()
         self.detail_info_urls = []
         self._info_uri = '/cn/vl_update.php?list&mode=&page='
